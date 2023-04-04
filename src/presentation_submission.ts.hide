@@ -1,0 +1,93 @@
+import { PresentationDefinition } from "./types";
+
+export type ValidatePresentationSubmissionOptions =
+  VerifyPresentationOptions & {
+    knownSchemas?: Record<string, Record<string, unknown>>;
+  };
+
+// FOLLOW_UP: need new type for this union?
+export function buildPresentationSubmission(
+  presentationDefinition: PresentationDefinition,
+  verifiableCredential:
+    | Verifiable<W3CCredential>
+    | Verifiable<W3CCredential>[]
+    | JWT
+    | JWT[]
+): PresentationSubmissionWrapper {
+  const submissionWrapper = new PresentationSubmissionWrapperBuilder()
+    .verifiableCredential(verifiableCredential)
+    .withPresentationSubmission((b) =>
+      b.initFromPresentationDefinition(presentationDefinition)
+    )
+    .build();
+
+  return submissionWrapper;
+}
+
+export async function composePresentationSubmissionJWT(
+  signer: Signer,
+  presentationDefinition: PresentationDefinition,
+  verifiableCredential:
+    | Verifiable<W3CCredential>
+    | Verifiable<W3CCredential>[]
+    | JWT
+    | JWT[],
+  options?: VerifyPresentationOptions
+): Promise<JWT> {
+  const submission = buildPresentationSubmission(
+    presentationDefinition,
+    verifiableCredential
+  );
+
+  const vp = await signVerifiablePresentationJWT(submission, signer, options);
+
+  return vp;
+}
+
+/**
+ * Verify and decode an encoded Presentation Submission.
+ *
+ * A Presentation Submission is a Verifiable Presentation. This method decodes
+ * the submitted Presentation Submission, verifies it as a Verifiable
+ * Presentation, and returns the decoded Presentation Submission.
+ *
+ * @returns the decoded Presentation Submission
+ * @throws VerificationException if the Presentation Submission is not a valid Verifiable Presentation
+ */
+export async function verifyPresentationSubmissionJWT(
+  encodedSubmission: JWT,
+  options?: ValidatePresentationSubmissionOptions
+): Promise<VerifiablePresentationSubmission> {
+  const presentation = await verifyVerifiablePresentationJWT(
+    encodedSubmission,
+    options
+  );
+  return presentation;
+}
+
+/**
+ * Decode, verify, and validate a JWT-encoded encoded Presentation Submission.
+ *
+ * This is a convenience wrapper around `verifyPresentationSubmissionJWT` and `validatePresentationSubmission`,`,
+ * which can be called separately.
+ *
+ * @returns the decoded Presentation Submission
+ * @throws VerificationException if the PresentationSubmission is not a valid
+ *  Verifiable Presentation
+ * @throws ValidationException if the Presentation Submission does not match the requirements
+ */
+export async function validatePresentationSubmissionJWTForDefinition(
+  encodedSubmission: JWT,
+  presentationDefinition: PresentationDefinition,
+  options?: ValidatePresentationSubmissionOptions
+): Promise<VerifiablePresentationSubmission> {
+  const decodedSubmission = await verifyPresentationSubmissionJWT(
+    encodedSubmission,
+    options
+  );
+  await validatePresentationSubmission(
+    decodedSubmission,
+    presentationDefinition
+  );
+  return decodedSubmission;
+}
