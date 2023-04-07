@@ -1,4 +1,4 @@
-import { enumerateProperties, requiredProperties } from "..";
+import { enumerateProperties, requiredProperties } from "../../..";
 
 const example = {
   type: "https://w3c-ccg.github.io/vc-json-schemas/",

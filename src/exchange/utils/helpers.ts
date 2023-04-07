@@ -1,5 +1,5 @@
 import { isEmpty } from "lodash";
-import { FieldBuilder } from "./builders";
+import { FieldBuilder } from "../builders";
 
 import {
   ClaimFormatDesignations,
@@ -7,7 +7,7 @@ import {
   DataMappingSchema,
   Field,
   StatusConstraints,
-} from "./types";
+} from "..";
 
 // Note: this file contains a lot of VC-isms, but mixed with PE-isms
 export const CREDENTIAL_SCHEMA_PROPERTY_NAME = "credentialSchema";

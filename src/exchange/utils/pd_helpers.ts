@@ -1,11 +1,9 @@
 import { v4 as uuidv4 } from "uuid";
 import { isEmpty } from "lodash";
 
-import {
-  PresentationDefinitionBuilder,
-  PresentationSubmissionWrapperBuilder,
-} from "./builders";
-import { CredentialSchema2022 } from "./CredentialSchema";
+import { Verifiable, W3CCredential } from "did-jwt-vc";
+import { PresentationSubmissionWrapperBuilder } from "..";
+import { PresentationDefinitionBuilder } from "../builders";
 import {
   ACTIVE_STATUS_CONSTRAINT,
   schemaConstraint,
@@ -14,10 +12,8 @@ import {
 import {
   DescriptorMapEntry,
   PresentationDefinition,
-  PresentationSubmission,
   PresentationSubmissionWrapper,
-} from "./types";
-import { Verifiable, W3CCredential } from "did-jwt-vc";
+} from "../types";
 
 // TODO: https://w3c.github.io/vc-json-schema/
 const schema =

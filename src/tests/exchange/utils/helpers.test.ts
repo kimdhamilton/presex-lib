@@ -1,4 +1,4 @@
-import { schemaConstraint, trustedIssuerConstraint } from "../helpers";
+import { schemaConstraint, trustedIssuerConstraint } from "../../../exchange";
 
 describe("helpers", () => {
   it("trustedIssuerContraint works", () => {

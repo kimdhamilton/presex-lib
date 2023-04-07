@@ -1,7 +1,7 @@
 import {
   buildPresentationDefinitionFromSchema,
   buildPresentationSubmission,
-} from "../pd_helpers";
+} from "../../../exchange";
 
 describe("Presentation Definition Helpers", () => {
   it("Creates Presentation Definition from Schema", () => {
