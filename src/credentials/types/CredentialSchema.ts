@@ -17,18 +17,19 @@ export interface JSONSchemaInner {
   [key: string]: any; // Index signature for extensibility
 }
 
-export interface CredentialSubject {
+export interface CredentialSubjectSchema {
   type: string;
   properties: JSONSchemaInner;
 }
 
+// TODO: clarify names
 export interface Schema {
   $id: string;
   $schema: string;
   description: string;
   type: string;
   properties: {
-    credentialSubject: CredentialSubject;
+    credentialSubject: CredentialSubjectSchema;
   };
 }
 

@@ -7,7 +7,7 @@ import { PresentationSubmissionBuilder } from ".";
 import {
   VC_CONTEXT_URI,
   VERIFIABLE_PRESENTATION_TYPE_NAME,
-} from "../../constants";
+} from "../../credentials/constants";
 
 export const PRESENTATION_SUBMISSION_TYPE_NAME = "PresentationSubmission";
 

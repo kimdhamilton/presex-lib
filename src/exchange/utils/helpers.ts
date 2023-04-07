@@ -8,13 +8,19 @@ import {
   Field,
   StatusConstraints,
 } from "..";
+import {
+  CREDENTIAL_SCHEMA_PROPERTY_NAME,
+  CREDENTIAL_SUBJECT_PROPERTY_NAME,
+  ID_PROPERTY_NAME,
+  VC_CONTEXT_URI,
+} from "../../credentials";
 
 // Note: this file contains a lot of VC-isms, but mixed with PE-isms
-export const CREDENTIAL_SCHEMA_PROPERTY_NAME = "credentialSchema";
-export const CREDENTIAL_SUBJECT_PROPERTY_NAME = "credentialSubject";
-export const ID_PROPERTY_NAME = "id";
 
 export const EDDSA = "EdDSA";
+
+export const CREDENTIAL_MANIFEST_SPEC_VERSION_1_0_0 =
+  "https://identity.foundation/credential-manifest/spec/v1.0.0/";
 
 export const JWT_CLAIM_FORMAT_DESIGNATION: ClaimFormatDesignations = {
   jwt_vc: {
