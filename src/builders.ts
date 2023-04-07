@@ -1,3 +1,4 @@
+import { Verifiable, W3CCredential } from "did-jwt-vc";
 import {
   ClaimFormatDesignations,
   InputDescriptorConstraints,
@@ -11,6 +12,7 @@ import {
   JSONSchema,
   DescriptorMapEntry,
   PresentationSubmission,
+  PresentationSubmissionWrapper,
 } from "./types";
 
 export class PresentationDefinitionBuilder {
@@ -375,10 +377,17 @@ export class FieldBuilder<
   }
 }
 
-export class PresentationSubmissionBuilder {
+export class PresentationSubmissionBuilder<
+  P extends PresentationSubmissionWrapperBuilder
+> {
   private readonly _data: Partial<PresentationSubmission> = {};
+  private readonly _parent?: P;
 
-  constructor() {}
+  constructor(parent?: P) {
+    if (parent) {
+      this._parent = parent;
+    }
+  }
 
   id(id: string): this {
     this._data.id = id;
@@ -418,6 +427,22 @@ export class PresentationSubmissionBuilder {
     return new DescriptorMapEntryBuilder(this);
   }
 
+  /**
+   * Ends the startPresentationSubmission scope created by the parent to complete creation of this PresentationSubmission
+   * and return to parent's scope
+   * @returns
+   */
+  endPresentationSubmission(): PresentationSubmissionWrapperBuilder {
+    if (!this._parent) {
+      throw new Error(
+        "Parent was not provided; use build() if you are creating this as a standalone object, or use the startX method on the parent to use nested building styles"
+      );
+    }
+    const result = this.build();
+    this._parent.presentation_submission(result);
+    return this._parent;
+  }
+
   build(): PresentationSubmission {
     const missingFields: string[] = [];
     if (!this._data.hasOwnProperty("id")) missingFields.push("id");
@@ -438,7 +463,7 @@ export class PresentationSubmissionBuilder {
 }
 
 export class DescriptorMapEntryBuilder<
-  P extends PresentationSubmissionBuilder
+  P extends PresentationSubmissionBuilder<PresentationSubmissionWrapperBuilder>
 > {
   private readonly _data: Partial<DescriptorMapEntry> = {};
   private readonly _parent?: P;
@@ -473,7 +498,7 @@ export class DescriptorMapEntryBuilder<
    * and return to parent's scope
    * @returns
    */
-  endDescriptorMapEntry(): PresentationSubmissionBuilder {
+  endDescriptorMapEntry(): PresentationSubmissionBuilder<PresentationSubmissionWrapperBuilder> {
     if (!this._parent) {
       throw new Error(
         "Parent was not provided; use build() if you are creating this as a standalone object, or use the startX method on the parent to use nested building styles"
@@ -498,5 +523,74 @@ export class DescriptorMapEntryBuilder<
     }
 
     return this._data as DescriptorMapEntry;
+  }
+}
+
+// Common CM/PE
+export const PRESENTATION_SUBMISSION_TYPE_NAME = "PresentationSubmission";
+
+// Common VC/VP
+export const VERIFIABLE_CREDENTIAL_TYPE_NAME = "VerifiableCredential";
+export const VERIFIABLE_PRESENTATION_TYPE_NAME = "VerifiablePresentation";
+export const VC_CONTEXT_URI = "https://www.w3.org/2018/credentials/v1";
+
+// TODO: name
+export class PresentationSubmissionWrapperBuilder {
+  private _data: Partial<PresentationSubmissionWrapper> = {
+    "@context": [VC_CONTEXT_URI],
+    type: [
+      VERIFIABLE_PRESENTATION_TYPE_NAME,
+      PRESENTATION_SUBMISSION_TYPE_NAME,
+    ],
+  };
+
+  id(id: string): PresentationSubmissionWrapperBuilder {
+    this._data.id = id;
+    return this;
+  }
+
+  verifiableCredential(
+    ...verifiableCredential: Verifiable<W3CCredential>[]
+  ): PresentationSubmissionWrapperBuilder {
+    const vcPayload = Array.isArray(verifiableCredential)
+      ? verifiableCredential
+      : [verifiableCredential];
+    this._data.verifiableCredential = vcPayload;
+    return this;
+  }
+
+  holder(holder: string): PresentationSubmissionWrapperBuilder {
+    this._data.holder = holder;
+    return this;
+  }
+
+  presentation_submission(
+    presentation_submission: PresentationSubmission
+  ): PresentationSubmissionWrapperBuilder {
+    this._data.presentation_submission = presentation_submission;
+    return this;
+  }
+
+  /**
+   * Enables fluent creatiion of Presentation Submission through nested builders. When complete, call
+   * endPresentationSubmission()
+   * @returns
+   */
+  startPresentationSubmission(): PresentationSubmissionBuilder<this> {
+    return new PresentationSubmissionBuilder(this);
+  }
+
+  issuanceDate(issuanceDate: string): PresentationSubmissionWrapperBuilder {
+    this._data.issuanceDate = issuanceDate;
+    return this;
+  }
+
+  expirationDate(expirationDate: string): PresentationSubmissionWrapperBuilder {
+    this._data.expirationDate = expirationDate;
+    return this;
+  }
+
+  build(): PresentationSubmissionWrapper {
+    return this._data as PresentationSubmissionWrapper;
   }
 }

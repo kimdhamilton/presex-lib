@@ -6,6 +6,7 @@ import {
   ConstraintDirective,
   DataMappingSchema,
   Field,
+  StatusConstraints,
 } from "./types";
 
 // Note: this file contains a lot of VC-isms, but mixed with PE-isms
@@ -45,9 +46,9 @@ export const DATE_TIME_SCHEMA: DataMappingSchema = {
 
 export const NUMBER_SCHEMA: DataMappingSchema = { type: "number" };
 
-export const ACTIVE_STATUS_CONSTRAINT = {
+export const ACTIVE_STATUS_CONSTRAINT: StatusConstraints = {
   active: {
-    directive: ConstraintDirective.REQUIRED,
+    directive: "required",
   },
 };
 

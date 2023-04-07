@@ -1,3 +1,5 @@
+import { Verifiable, W3CPresentation } from "did-jwt-vc";
+
 export interface PresentationDefinition {
   id: string;
   name?: string;
@@ -73,10 +75,6 @@ export interface PresentationSubmission {
   id: string;
   definition_id: string;
   descriptor_map: DescriptorMapEntry[];
-}
-
-export interface PresentationSubmissionWrapper {
-  presentation_submission: PresentationSubmission;
 }
 
 export interface DescriptorMapEntry {
@@ -165,3 +163,7 @@ export interface DataMappingSchemaString {
 export type DataMappingSchema =
   | DataMappingSchemaString
   | DataMappingSchemaNonString;
+
+export type PresentationSubmissionWrapper = W3CPresentation & {
+  presentation_submission: PresentationSubmission;
+};
