@@ -3,6 +3,7 @@ import {
   RefreshService,
   CredentialPayload_v1_1,
   CredentialSubjectSchema,
+  CredentialSubject,
 } from "../types";
 import { DEFAULT_CONTEXT, VERIFIABLE_CREDENTIAL_TYPE_NAME } from "../constants";
 import { CredentialStatus } from "../types";
@@ -12,11 +13,12 @@ export interface CredentialSubjectBuilder {
   build(): CredentialSubjectSchema;
 }
 
+// TODO: is this Payload or Credential?
 export class CredentialPayloadBuilder {
-  _builder: Partial<CredentialPayload_v1_1>;
+  _data: Partial<CredentialPayload_v1_1>;
 
   constructor() {
-    this._builder = {
+    this._data = {
       "@context": DEFAULT_CONTEXT,
       type: VERIFIABLE_CREDENTIAL_TYPE_NAME,
     };
@@ -28,7 +30,7 @@ export class CredentialPayloadBuilder {
     const filteredCredentialTypes = type.filter(
       (t) => t !== VERIFIABLE_CREDENTIAL_TYPE_NAME
     );
-    this._builder.type = [
+    this._data.type = [
       VERIFIABLE_CREDENTIAL_TYPE_NAME,
       ...filteredCredentialTypes,
     ];
@@ -36,56 +38,56 @@ export class CredentialPayloadBuilder {
   }
 
   credentialSubject(
-    credentialSubject: CredentialSubjectSchema
+    credentialSubject: CredentialSubject
   ): CredentialPayloadBuilder {
-    this._builder.credentialSubject = credentialSubject;
+    this._data.credentialSubject = credentialSubject;
     return this;
   }
 
   issuer(issuerDid: string): CredentialPayloadBuilder {
-    this._builder.issuer = { id: issuerDid };
+    this._data.issuer = { id: issuerDid };
     return this;
   }
 
   credentialSchema(
     credentialSchema: CredentialSchema
   ): CredentialPayloadBuilder {
-    this._builder.credentialSchema = credentialSchema;
+    this._data.credentialSchema = credentialSchema;
     return this;
   }
 
   credentialStatus(
     credentialStatus: CredentialStatus
   ): CredentialPayloadBuilder {
-    this._builder.credentialStatus = credentialStatus;
+    this._data.credentialStatus = credentialStatus;
     return this;
   }
 
   refreshService(refreshService: RefreshService): CredentialPayloadBuilder {
-    this._builder.refreshService = refreshService;
+    this._data.refreshService = refreshService;
     return this;
   }
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   evidence(evidence: any[]): CredentialPayloadBuilder {
-    this._builder.evidence = evidence;
+    this._data.evidence = evidence;
     return this;
   }
 
   issuanceDate(issuanceDate: Date | string): CredentialPayloadBuilder {
-    this._builder.issuanceDate = issuanceDate;
+    this._data.issuanceDate = issuanceDate;
     return this;
   }
 
   expirationDate(expirationDate: Date | string): CredentialPayloadBuilder {
-    this._builder.expirationDate = expirationDate;
+    this._data.expirationDate = expirationDate;
     return this;
   }
 
   build(): CredentialPayload_v1_1 {
-    if (!this._builder.issuanceDate) {
-      this._builder.issuanceDate = new Date();
+    if (!this._data.issuanceDate) {
+      this._data.issuanceDate = new Date();
     }
-    return this._builder as CredentialPayload_v1_1;
+    return this._data as CredentialPayload_v1_1;
   }
 }
