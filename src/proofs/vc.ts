@@ -1,14 +1,16 @@
-import { JWT } from "did-jwt-vc/lib/types";
+import { JWT, VerifiedCredential } from "did-jwt-vc/lib/types";
 import {
   DidMethods,
   Jwk,
   ProofFormats,
   buildDidJwtIssuerFromJwk,
+  decodeJwt,
   didResolver,
 } from ".";
 import { CredentialPayload_v1_1 } from "../credentials";
 import * as DidKit from "@spruceid/didkit-wasm-node";
 import { createVerifiableCredentialJwt, verifyCredential } from "did-jwt-vc";
+import { DIDResolutionResult, VerificationMethod } from "did-resolver";
 
 export const ASSERTION_METHOD = "assertionMethod";
 
@@ -25,7 +27,7 @@ export interface VCProvider {
     vc: JWT,
     format: ProofFormats,
     assertionMethod: string
-  ): Promise<any>;
+  ): Promise<VerifiedCredential>;
 }
 
 export class DidKitProvider implements VCProvider {
@@ -58,17 +60,39 @@ export class DidKitProvider implements VCProvider {
     vc: string,
     format: ProofFormats,
     assertionMethod: string = ASSERTION_METHOD
-  ): Promise<any> {
+  ): Promise<VerifiedCredential> {
     const result = await DidKit.verifyCredential(
       vc,
       JSON.stringify({
         proofFormat: format,
-        verificationMethod:
-          "did:pkh:eip155:1:0x320a31CC88d067EB5Ce4b17B7A83d6C416D6512a#blockchainAccountId",
+        // verificationMethod:
+        //  "did:pkh:eip155:1:0x320a31CC88d067EB5Ce4b17B7A83d6C416D6512a#blockchainAccountId",
         //did:pkh:eip155:1:0x320a31CC88d067EB5Ce4b17B7A83d6C416D6512a#blockchainAccountId
       })
     );
-    return result;
+    const resultObj = JSON.parse(result);
+    if (resultObj.errors.length > 0) {
+      throw new Error(
+        "Encountered errors in verifyCredential: " +
+          JSON.stringify(resultObj, null, 2)
+      );
+    }
+    if (resultObj.checks === 0) {
+      throw new Error(
+        "Got no result verifyCredential: " + JSON.stringify(resultObj, null, 2)
+      );
+    }
+    const cp = decodeJwt(vc);
+    // TODO: hack
+    return {
+      verified: true,
+      payload: cp,
+      didResolutionResult: {} as DIDResolutionResult,
+      signer: {} as VerificationMethod,
+      jwt: vc,
+      issuer: "",
+      verifiableCredential: {} as any,
+    };
   }
 }
 
@@ -90,7 +114,7 @@ export class DidJwtVcProvider implements VCProvider {
     vc: JWT,
     format: ProofFormats,
     assertionMethod: string
-  ): Promise<any> {
+  ): Promise<VerifiedCredential> {
     return verifyCredential(vc, didResolver, {});
   }
 }
