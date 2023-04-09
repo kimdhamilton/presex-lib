@@ -1,4 +1,4 @@
-import { Verifiable, W3CCredential } from "did-jwt-vc";
+import { Verifiable, VerifiableCredential, W3CCredential } from "did-jwt-vc";
 import {
   PresentationSubmission,
   PresentationSubmissionWrapper,
@@ -26,7 +26,7 @@ export class PresentationSubmissionWrapperBuilder {
   }
 
   verifiableCredential(
-    ...verifiableCredential: Verifiable<W3CCredential>[]
+    ...verifiableCredential: VerifiableCredential[]
   ): PresentationSubmissionWrapperBuilder {
     const vcPayload = Array.isArray(verifiableCredential)
       ? verifiableCredential

@@ -1,8 +1,5 @@
 {
-  "@context": [
-    "https://www.w3.org/2018/credentials/v1",
-    { "@vocab": "https://schema.org/" }
-  ],
+  "@context": ["https://www.w3.org/2018/credentials/v1"],
   "type": ["VerifiableCredential", "EmailCredential"],
   "id": "http://example.org/credentials/3731",
   "credentialSubject": {

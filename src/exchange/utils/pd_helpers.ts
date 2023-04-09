@@ -1,7 +1,7 @@
 import { v4 as uuidv4 } from "uuid";
 import { isEmpty } from "lodash";
 
-import { Verifiable, W3CCredential } from "did-jwt-vc";
+import { Verifiable, VerifiableCredential, W3CCredential } from "did-jwt-vc";
 import { PresentationSubmissionWrapperBuilder } from "..";
 import { PresentationDefinitionBuilder } from "../builders";
 import {
@@ -47,8 +47,8 @@ export function buildPresentationDefinitionFromSchema(
 export function buildPresentationSubmission(
   presentationDefinition: PresentationDefinition,
   holder: string,
-  id: string = uuidv4(),
-  ...verifiableCredential: Verifiable<W3CCredential>[]
+  verifiableCredential: VerifiableCredential,
+  id: string = uuidv4()
 ): PresentationSubmissionWrapper {
   const ds =
     presentationDefinition.input_descriptors.map((d, i) => {
@@ -60,7 +60,7 @@ export function buildPresentationSubmission(
     }) ?? [];
 
   const submissionWrapper = new PresentationSubmissionWrapperBuilder()
-    .verifiableCredential(...verifiableCredential)
+    .verifiableCredential(verifiableCredential)
     .holder(holder)
     .startPresentationSubmission()
     .id(id)
