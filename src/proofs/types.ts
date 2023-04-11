@@ -14,8 +14,8 @@ export interface Jwk {
 
 export enum DidMethods {
   PKH_ETH = "pkh:eip155:1",
-  PKH_WEB = "web",
   KEY = "key",
+  WEB = "web"
 }
 
 export enum ProofFormats {

@@ -14,41 +14,51 @@ import { DIDResolutionResult, VerificationMethod } from "did-resolver";
 
 export const ASSERTION_METHOD = "assertionMethod";
 
+interface ProofOptions {
+  method?: DidMethods
+  format?: ProofFormats
+  assertionMethod?: string
+  verificationMethod?: any
+}
+
+// TODO: see if there are ways to clean up these method signatures
 export interface VCProvider {
   signCredential(
-    method: DidMethods,
     jwk: Jwk,
-    format: ProofFormats,
+    did: string,
     credential: CredentialPayload_v1_1,
-    assertionMethod: string
+    proofOptions: ProofOptions
   ): Promise<JWT>;
 
   verifyCredential(
     vc: JWT,
-    format: ProofFormats,
-    assertionMethod: string
+    proofOptions: ProofOptions
   ): Promise<VerifiedCredential>;
 }
 
 export class DidKitProvider implements VCProvider {
   async signCredential(
-    method: DidMethods,
     jwk: Jwk,
-    format: ProofFormats,
+    did: string,
     credential: CredentialPayload_v1_1,
-    assertionMethod: string = ASSERTION_METHOD
+    proofOptions: ProofOptions
   ): Promise<JWT> {
     const keyStr = JSON.stringify(jwk);
-    const verificationMethod = await DidKit.keyToVerificationMethod(
-      method,
+    let verificationMethod
+    if (proofOptions.method === DidMethods.KEY) {
+     verificationMethod = await DidKit.keyToVerificationMethod(
+      proofOptions.method,
       keyStr
     );
+     } else if (proofOptions.method === DidMethods.WEB) {
+      verificationMethod = proofOptions.verificationMethod
+     }
 
     const issuedCredential = await DidKit.issueCredential(
       JSON.stringify(credential),
       JSON.stringify({
-        proofPurpose: assertionMethod,
-        proofFormat: format,
+        proofPurpose: proofOptions.assertionMethod,
+        proofFormat: proofOptions.format,
         verificationMethod: verificationMethod,
       }),
       keyStr
@@ -58,13 +68,12 @@ export class DidKitProvider implements VCProvider {
 
   async verifyCredential(
     vc: string,
-    format: ProofFormats,
-    assertionMethod: string = ASSERTION_METHOD
+    proofOptions: ProofOptions
   ): Promise<VerifiedCredential> {
     const result = await DidKit.verifyCredential(
       vc,
       JSON.stringify({
-        proofFormat: format,
+        proofFormat: proofOptions.format,
         // verificationMethod:
         //  "did:pkh:eip155:1:0x320a31CC88d067EB5Ce4b17B7A83d6C416D6512a#blockchainAccountId",
         //did:pkh:eip155:1:0x320a31CC88d067EB5Ce4b17B7A83d6C416D6512a#blockchainAccountId
@@ -100,20 +109,18 @@ export class DidJwtVcProvider implements VCProvider {
   DidJwtVcProvider() {}
 
   async signCredential(
-    method: DidMethods,
     jwk: Jwk,
-    format: ProofFormats,
+    did: string, 
     credential: CredentialPayload_v1_1,
-    assertionMethod: string
+    proofOptions: ProofOptions
   ): Promise<JWT> {
-    const issuer = buildDidJwtIssuerFromJwk(jwk, method);
+    const issuer = buildDidJwtIssuerFromJwk(jwk, did);
     return createVerifiableCredentialJwt(credential, issuer, {});
   }
 
   verifyCredential(
     vc: JWT,
-    format: ProofFormats,
-    assertionMethod: string
+    proofOptions: ProofOptions,
   ): Promise<VerifiedCredential> {
     return verifyCredential(vc, didResolver, {});
   }

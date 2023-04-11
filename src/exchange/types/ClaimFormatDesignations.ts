@@ -8,10 +8,10 @@ export interface ClaimFormatDesignationProof {
 
 // Note: not extensible
 export interface ClaimFormatDesignations {
-  jwt?: ClaimFormatDesignationAlg;
+  jwt?: ClaimFormatDesignationAlg; // TODO: or JwtFormat?
   jwt_vc?: ClaimFormatDesignationAlg;
   jwt_vp?: ClaimFormatDesignationAlg;
-  ldp_vc?: ClaimFormatDesignationProof;
+  ldp_vc?: ClaimFormatDesignationProof; // TODO: or LdpFormat?
   ldp_vp?: ClaimFormatDesignationProof;
   ldp?: ClaimFormatDesignationProof;
 }

@@ -63,8 +63,7 @@ export function jwkToPrivateKeyHex(jwk: Jwk): Uint8Array {
   }
 }
 
-export function buildDidJwtIssuerFromJwk(jwk: Jwk, method: DidMethods): Issuer {
-  const did = jwkToDid(method, jwk);
+export function buildDidJwtIssuerFromJwk(jwk: Jwk, did: string): Issuer {
   const privateKey = jwkToPrivateKeyHex(jwk);
   return {
     did,
