@@ -23,10 +23,14 @@ export class CredentialPayloadBuilder {
       type: VERIFIABLE_CREDENTIAL_TYPE_NAME,
     };
   }
-  // TODO: id
+
+  id(id: string): CredentialPayloadBuilder {
+    this._data.id = id;
+    return this;
+  }
 
   type(...type: string[]): CredentialPayloadBuilder {
-    // append all types other than "Verifiable Credential", which we always include
+    // append all types other than "VerifiableCredential", which we always include
     const filteredCredentialTypes = type.filter(
       (t) => t !== VERIFIABLE_CREDENTIAL_TYPE_NAME
     );

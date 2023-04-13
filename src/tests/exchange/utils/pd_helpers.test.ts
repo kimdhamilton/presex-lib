@@ -47,6 +47,7 @@ describe("Presentation Definition Helpers", () => {
       "https://someSchema.org",
       "MyCredentialType"
     );
+    console.log(JSON.stringify(pd, null, 2));
     expect(pd).toMatchObject(expected);
   });
 
@@ -61,11 +62,14 @@ describe("Presentation Definition Helpers", () => {
 
     const provider = new DidJwtVcProvider();
     const jwt = await provider.signCredential(
-      DidMethods.KEY,
       signerJwk,
-      ProofFormats.JWT,
+      did,
       credential,
-      ASSERTION_METHOD
+      {
+        format: ProofFormats.JWT,
+        method: DidMethods.KEY,
+        assertionMethod: ASSERTION_METHOD,
+      }
     );
 
     const pd = buildPresentationDefinitionFromSchema(
@@ -74,6 +78,5 @@ describe("Presentation Definition Helpers", () => {
     );
     const ps = buildPresentationSubmission(pd, did, jwt);
     console.log(JSON.stringify(ps, null, 2));
-    // TODO: vcs should be required
   });
 });
